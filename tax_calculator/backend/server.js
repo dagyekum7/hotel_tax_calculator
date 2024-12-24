@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 
 const app = express();
 const port = 5000;
@@ -8,20 +9,22 @@ const port = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const roomPrices = {
-  9: 200, 19: 200, 8: 200,
-  31: 250,
-  7: 140,
-  22: 170, 18: 170, 25: 170, 17: 170, 26: 170,
-  11: 120, 21: 120, 28: 120, 24: 120, 30: 120, 10: 120, 29: 120, 27: 120, 23: 120,20:120,
-};
+let roomPrices;
+
+// Load room data dynamically
+try {
+  roomPrices = JSON.parse(fs.readFileSync('./rooms.json', 'utf8'));
+} catch (error) {
+  console.error('Error loading room configuration:', error);
+  roomPrices = {}; // Empty fallback
+}
 
 function calculateTaxes(totalIncome) {
   const getfundTaxRate = 0.025;
   const nhisTaxRate = 0.025;
   const covidTaxRate = 0.01;
   const vatRate = 0.15;
-  
+
   const getfundTax = totalIncome * getfundTaxRate;
   const nhisTax = totalIncome * nhisTaxRate;
   const covidTax = totalIncome * covidTaxRate;
@@ -36,7 +39,7 @@ function calculateTaxes(totalIncome) {
     nhisTax,
     covidTax,
     vat,
-    totalTax
+    totalTax,
   };
 }
 
@@ -45,23 +48,18 @@ app.post('/calculate', (req, res) => {
 
   let totalIncome = 0;
 
-  console.log("Received room numbers:", roomNumbers); // Debugging
-
   for (let room of roomNumbers) {
     if (!roomPrices[room]) {
       return res.status(400).json({ error: `Room ${room} is not valid.` });
     }
     totalIncome += roomPrices[room];
-    console.log(`Adding room ${room} price: ${roomPrices[room]}`); // Debugging
   }
-
-  console.log("Total income calculated:", totalIncome); // Debugging
 
   const taxes = calculateTaxes(totalIncome);
 
   res.json({
     totalIncome,
-    taxes
+    taxes,
   });
 });
 
