@@ -1,0 +1,17 @@
+{
+  "name": "hotel_tax_calculator",
+  "version": "1.0.0",
+  "description": "A web-based application for calculating hotel income and taxes. The app allows users to input the room numbers of occupied rooms, calculates the total income based on predefined room rates, and applies taxes like GetFund Levy, NHIL, COVID tax, and VAT.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm start --prefix tax_calculator/backend",
+    "client": "npm start --prefix tax_calculator/tax-frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
